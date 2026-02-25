@@ -1,4 +1,4 @@
-# ichatbio-bhl-agent
+# ichatbio-ncbi-agent
 
 An agent for accessing the NCBI Nucleotide database.
 
