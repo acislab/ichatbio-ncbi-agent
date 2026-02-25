@@ -1,25 +1,40 @@
 import pytest
-from ichatbio.agent_response import DirectResponse, ProcessBeginResponse, ProcessLogResponse, ArtifactResponse, \
-    ResponseMessage
+import pytest_asyncio
+from ichatbio.agent_response import ArtifactResponse
 
-from src.agent import HelloWorldAgent
+from agent import NCBINucleotideAgent
+from entrypoints import find_sequence_records, get_sequence_record
+
+
+@pytest_asyncio.fixture()
+def agent():
+    return NCBINucleotideAgent()
 
 
 @pytest.mark.asyncio
-async def test_hello_world(context, messages):
-    # The test `context` populates the `messages` list with the agent's responses
-    await HelloWorldAgent().run(context, "Hi", "hello", None)
+async def test_find_sequence_records(agent, context, messages):
+    await agent.run(
+        context,
+        "Blah blah blah",
+        "find_sequence_records",
+        find_sequence_records.Parameters(search_terms="Rattus rattus")
+    )
 
-    # Message objects are restricted to the following types:
-    messages: list[ResponseMessage]
+    artifacts = [m for m in messages if isinstance(m, ArtifactResponse)]
 
-    # We can test all the agent's responses at once
-    assert messages == [
-        ProcessBeginResponse("Thinking"),
-        ProcessLogResponse("Hello world!"),
-        ArtifactResponse(mimetype="text/html",
-                         description="The Wikipedia page for \"Hello World\"",
-                         uris=["https://en.wikipedia.org/wiki/Hello_World"],
-                         metadata={'source': 'Wikipedia'}),
-        DirectResponse("I said it!")
-    ]
+    assert artifacts[0].mimetype == "application/json"
+
+
+@pytest.mark.asyncio
+async def test_get_sequence_record(agent, context, messages):
+    await agent.run(
+        context,
+        "Blah blah blah",
+        "get_sequence_record",
+        get_sequence_record.Parameters(accession_number="JQ814272")
+    )
+
+    artifacts = [m for m in messages if isinstance(m, ArtifactResponse)]
+
+    assert artifacts[0].mimetype == "application/json"
+    assert artifacts[1].mimetype == "text/plain"

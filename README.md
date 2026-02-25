@@ -1,6 +1,6 @@
-# ichatbio-agent-example
+# ichatbio-bhl-agent
 
-A template for making new iChatBio agents.
+An agent for accessing the NCBI Nucleotide database.
 
 ## Quickstart
 
@@ -9,9 +9,9 @@ A template for making new iChatBio agents.
 Set up your development environment:
 
 ```bash
-python3 -m venv .venv
+pip3 install uv
+uv sync
 source .venv/bin/activate
-pip install .
 ```
 
 Run the server:
