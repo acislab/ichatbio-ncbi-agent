@@ -73,7 +73,7 @@ async def run(context: ResponseContext, parameters: Parameters):
                 "derived_from": search_url
             }
         )
-        
+
         if any(error.startswith("Phrase not found") for error in results.errors):
             await context.reply(
                 "The search failed with the error: 'Phrase not found'. This means the search terms did not match any indexed metadata fields. "
@@ -94,10 +94,10 @@ class SearchResults(BaseModel):
 def _parse_search_results(xml: str):
     parsed = xmltodict.parse(xml)
     data = parsed.get("eSearchResult")
-    
+
     if not data:
         raise ValueError("Invalid response from NCBI: missing eSearchResult element")
-    
+
     errors = []
     error_list = data.get("ErrorList")
     if error_list:
@@ -105,18 +105,19 @@ def _parse_search_results(xml: str):
         if phrase_not_found:
             phrase = phrase_not_found if len(phrase_not_found) <= 100 else phrase_not_found[:100] + "..."
             errors.append(f"Phrase not found: {phrase}")
-    
+
     warnings = []
     warning_list = data.get("WarningList")
     if warning_list:
         output_message = warning_list.get("OutputMessage")
         if output_message:
             warnings.append(output_message)
-    
+
     return SearchResults(
         count=int(data.get("Count", 0)),
         page=int(data.get("RetStart", 0)),
         page_size=int(data.get("RetMax", 0)),
+        sequence_ids=data.get("IdList", {}).get("Id"),
         errors=errors,
         warnings=warnings
     )
