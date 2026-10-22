@@ -1,4 +1,4 @@
-from typing import override, Optional
+from typing import override
 
 from ichatbio.agent import IChatBioAgent
 from ichatbio.agent_response import ResponseContext
@@ -14,9 +14,11 @@ class NCBINucleotideAgent(IChatBioAgent):
     @override
     def get_agent_card(self) -> AgentCard:
         return AgentCard(
-            name="Nucleotide",
+            name="NCBI Nucleotide",
             description="Search tools for NCBI's Nucleotide (\"nuccore\") sequence database.",
-            icon=None,
+            version="2026-10-22",
+            documentation_url="https://github.com/acislab/ichatbio-ncbi-agent",
+            icon="https://raw.githubusercontent.com/acislab/ichatbio-ncbi-agent/refs/heads/main/src/resources/ncbi-symbol-white.png",
             entrypoints=[
                 find_sequence_records.entrypoint,
                 get_sequence_record.entrypoint
@@ -24,7 +26,14 @@ class NCBINucleotideAgent(IChatBioAgent):
         )
 
     @override
-    async def run(self, context: ResponseContext, request: str, entrypoint: str, params: Optional[BaseModel]):
+    async def run(
+            self,
+            context: ResponseContext,
+            request: str,
+            entrypoint: str,
+            params: BaseModel | None = None,
+            metadata: dict | None = None
+    ):
         match entrypoint:
             case find_sequence_records.entrypoint.id:
                 await find_sequence_records.run(context, params)

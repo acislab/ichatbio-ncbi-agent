@@ -1,14 +1,7 @@
 import pytest
-import pytest_asyncio
 from ichatbio.agent_response import ArtifactResponse
 
-from agent import NCBINucleotideAgent
 from entrypoints import find_sequence_records, get_sequence_record
-
-
-@pytest_asyncio.fixture()
-def agent():
-    return NCBINucleotideAgent()
 
 
 @pytest.mark.asyncio
